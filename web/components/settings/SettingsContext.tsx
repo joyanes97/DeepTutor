@@ -73,7 +73,7 @@ export type Catalog = {
 
 export type UiSettings = {
   theme: "light" | "dark" | "glass" | "snow";
-  language: "en" | "zh";
+  language: "en" | "zh" | "es";
 };
 
 export type ProviderOption = {
