@@ -15,6 +15,7 @@ import {
   selectClass,
   selectOptionClass,
 } from "@/components/settings/shared";
+import { APP_LANGUAGE_DEFINITIONS } from "@/i18n/languages";
 
 const CODE_BLOCK_PREVIEW_SNIPPET = `def fibonacci(n):
     """Generate the first n Fibonacci numbers."""
@@ -33,17 +34,23 @@ print(summary)
 
 const RichCodeBlockPreview = dynamic(
   () => import("@/components/common/RichCodeBlock"),
-  { ssr: false },
+  {
+    ssr: false,
+  },
 );
 
 export default function AppearanceSettingsPage() {
   const { t } = useTranslation();
   const {
     theme,
+    language,
+    responseLanguage,
     codeBlockTheme,
     codeBlockShowLineNumbers,
     codeBlockWrapLongLines,
     updateTheme,
+    updateLanguage,
+    updateResponseLanguage,
     updateCodeBlockTheme,
     updateCodeBlockShowLineNumbers,
     updateCodeBlockWrapLongLines,
@@ -65,9 +72,63 @@ export default function AppearanceSettingsPage() {
       <SettingsPageHeader
         title={t("Appearance")}
         description={t(
-          "Customize the visual theme and code blocks. Changes apply immediately and are stored in your account.",
+          "Tune the visual theme and interface language. Changes apply immediately and are stored in your account.",
         )}
       />
+
+      <SettingSection
+        title={t("Language")}
+        description={t("Choose the interface language.")}
+      >
+        <SettingRow
+          title={t("Interface language")}
+          description={t(
+            "Controls navigation, settings, and status text only.",
+          )}
+          control={
+            <div className="flex gap-0.5 rounded-lg bg-[var(--muted)] p-0.5">
+              {APP_LANGUAGE_DEFINITIONS.map(({ code, labelKey }) => (
+                <button
+                  key={code}
+                  onClick={() => updateLanguage(code)}
+                  className={`rounded-md px-2.5 py-1 text-[12px] transition-all ${
+                    language === code
+                      ? "bg-[var(--card)] font-medium text-[var(--foreground)] shadow-sm"
+                      : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+                  }`}
+                >
+                  {t(labelKey)}
+                </button>
+              ))}
+            </div>
+          }
+        />
+        <SettingRow
+          title={t("Model output language")}
+          description={t(
+            "Sets the default language for chat and capability responses.",
+          )}
+          control={
+            <div className="flex gap-0.5 rounded-lg bg-[var(--muted)] p-0.5">
+              {(["en", "zh"] as const).map((value) => (
+                <button
+                  key={value}
+                  onClick={() => updateResponseLanguage(value)}
+                  className={`rounded-md px-2.5 py-1 text-[12px] transition-all ${
+                    responseLanguage === value
+                      ? "bg-[var(--card)] font-medium text-[var(--foreground)] shadow-sm"
+                      : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+                  }`}
+                >
+                  {value === "en"
+                    ? t("language.english")
+                    : t("language.chinese")}
+                </button>
+              ))}
+            </div>
+          }
+        />
+      </SettingSection>
 
       <SettingSection
         title={t("Theme")}
