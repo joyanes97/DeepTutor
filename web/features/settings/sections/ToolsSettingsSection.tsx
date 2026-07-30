@@ -8,6 +8,7 @@ import { useTranslation } from "react-i18next";
 
 import { useSettings } from "@/features/settings/store/SettingsStore";
 import { SettingsPageHeader } from "@/components/settings/shared";
+import type { AppLanguage } from "@/i18n/languages";
 import { apiFetch, apiUrl } from "@/lib/api";
 import {
   toolAvailabilityCopy,
@@ -37,7 +38,7 @@ type BuiltinTool = {
   name: string;
   description: string;
   parameters: ToolParameter[];
-  hints: { en: ToolHints; zh: ToolHints };
+  hints: Partial<Record<AppLanguage, ToolHints>> & { en: ToolHints };
   aliases: string[];
   toggleable: boolean;
   enabled: boolean;
@@ -183,8 +184,10 @@ export default function ToolsSettingsPage() {
       .map((section) => ({
         ...section,
         tools: section.tools.filter((tool) => {
-          const hints = tool.hints[language];
-          const alternateHints = tool.hints[language === "zh" ? "en" : "zh"];
+          const hints = tool.hints[language] ?? tool.hints.en;
+          const alternateLanguage = language === "en" ? "zh" : "en";
+          const alternateHints =
+            tool.hints[alternateLanguage] ?? tool.hints.en;
           const searchableText = [
             tool.name,
             tool.description,
@@ -311,7 +314,7 @@ export default function ToolsSettingsPage() {
                 <div className="border-t border-[var(--border)]/60">
                   {list.map((tool, idx) => {
                     const isOpen = expanded.has(tool.name);
-                    const hints = tool.hints[language];
+                    const hints = tool.hints[language] ?? tool.hints.en;
                     const isPending = pending.has(tool.name);
                     const isComingSoon = !!tool.coming_soon;
                     const isAvailable = tool.available !== false;
