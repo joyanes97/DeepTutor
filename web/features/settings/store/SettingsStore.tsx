@@ -741,14 +741,6 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
       const loadedResponseLanguage =
         payload.ui.response_language ?? payload.ui.language;
       setResponseLanguage(loadedResponseLanguage);
-      // Reconcile the browser's copy with the server's. Without this the two
-      // inherit differently and drift permanently: the server derives
-      // `response_language` from `language` on every read, while the browser
-      // inherits only when its own key is absent. Flipping the interface
-      // language alone therefore left the server (and this page) showing 中文
-      // while every turn still shipped the "en" the bootstrap had stamped —
-      // the "I set Chinese and it answers in English" report.
-      writeStoredLanguage(payload.ui.language);
       writeStoredResponseLanguage(loadedResponseLanguage);
       // Writes the backend-loaded values into app-shell storage and dispatches
       // the code-block settings event; AppShellContext (the single source) picks

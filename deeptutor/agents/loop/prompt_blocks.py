@@ -19,7 +19,7 @@ from typing import Any
 from deeptutor.capabilities.protocol import PromptBlock
 from deeptutor.core.context import UnifiedContext
 from deeptutor.runtime.agentic.tool_dispatch import MAX_PARALLEL_TOOL_CALLS
-from deeptutor.services.prompt.language import append_language_directive
+from deeptutor.services.prompt.language import append_language_directive, normalize_language
 
 # These facts can change between turns without changing the tutor's rules.
 # They are replayed at their original history position, with a new snapshot
@@ -44,7 +44,7 @@ class LoopPromptAssembler:
 
     def __init__(self, *, prompts: dict[str, Any], language: str) -> None:
         self.prompts = prompts
-        self.language = "zh" if language.lower().startswith("zh") else "en"
+        self.language = normalize_language(language)
 
     def system_prompt(
         self,
