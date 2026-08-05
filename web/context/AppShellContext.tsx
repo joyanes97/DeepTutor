@@ -42,13 +42,13 @@ import {
   readStoredCodeBlockTheme,
   readStoredCodeBlockWrapLongLines,
   readStoredLanguage,
-  writeStoredResponseLanguage,
   readStoredSidebarCollapsed,
   writeStoredActiveSessionId,
   writeStoredCodeBlockShowLineNumbers,
   writeStoredCodeBlockTheme,
   writeStoredCodeBlockWrapLongLines,
   writeStoredLanguage,
+  writeStoredResponseLanguage,
   writeStoredSidebarCollapsed,
   type AppLanguage,
 } from "@/context/app-shell-storage";
@@ -103,32 +103,19 @@ export function AppShellProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
-    // The saved languages live in the backend's ui settings, but only the
-    // settings route ever read them, so every other page started in English
-    // until the user changed it again in this browser. Adopt them once, and
-    // only when this browser has made no choice of its own — a local selection
-    // is the more specific signal and must win.
-    //
-    // One fetch carries both fields: the interface locale and the
-    // reader-facing output language are stored together and are gated by the
-    // same "has this browser chosen yet?" question, so splitting them into two
-    // bootstraps would only give them a chance to disagree.
+    // Adopt each server-side language only when this browser has no more
+    // specific local choice for that preference.
+    const needsUiLanguage = !hasStoredLanguage();
+    const needsResponseLanguage = !hasStoredResponseLanguage();
+    if (!needsUiLanguage) setLanguageState(readStoredLanguage());
+    if (!needsUiLanguage && !needsResponseLanguage) {
+      setLanguageReady(true);
+      return;
+    }
     const controller = new AbortController();
     let cancelled = false;
     let fallbackTimer: ReturnType<typeof setTimeout> | undefined;
     void (async () => {
-      // Both keys are checked, not just the interface one. They were split
-      // after the interface language shipped, so a browser from before the
-      // split has `deeptutor-language` and no `deeptutor-response-language` —
-      // and returning here on the first alone locked it out of ever adopting
-      // the account's model output language.
-      if (hasStoredLanguage() && hasStoredResponseLanguage()) {
-        if (!cancelled) {
-          setLanguageState(readStoredLanguage());
-          setLanguageReady(true);
-        }
-        return;
-      }
       fallbackTimer = setTimeout(() => {
         controller.abort();
         if (!cancelled) setLanguageReady(true);
@@ -143,26 +130,21 @@ export function AppShellProvider({ children }: { children: React.ReactNode }) {
           language?: unknown;
           response_language?: unknown;
         };
-        if (payload.language !== "zh" && payload.language !== "en") return;
-        // Only what this browser is actually missing: a stored interface
-        // language is this user's own choice and the server must not overwrite
-        // it just because the response key was absent.
-        const hadLanguage = hasStoredLanguage();
-        if (!hadLanguage) writeStoredLanguage(payload.language);
-        if (!hasStoredResponseLanguage()) {
-          // A backend that predates the split sends no response_language;
-          // resolveResponseLanguage inherits the interface locale, matching
-          // what the server does for a legacy interface.json.
+        const uiLanguage = normalizeLanguage(payload.language);
+        if (needsUiLanguage) {
+          writeStoredLanguage(uiLanguage);
+          if (!cancelled) setLanguageState(uiLanguage);
+        }
+        if (needsResponseLanguage) {
           writeStoredResponseLanguage(
             resolveResponseLanguage(
               typeof payload.response_language === "string"
                 ? payload.response_language
                 : null,
-              payload.language,
+              uiLanguage,
             ),
           );
         }
-        if (!cancelled && !hadLanguage) setLanguageState(payload.language);
       } catch {
         // Offline or unauthenticated: keep the local default.
       } finally {
