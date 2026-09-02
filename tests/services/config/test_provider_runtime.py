@@ -193,6 +193,44 @@ def test_llm_orcarouter_base_keyword_gateway() -> None:
     assert resolved.effective_url == "https://api.orcarouter.ai/v1"
 
 
+def test_llm_omniroute_binding_uses_default_endpoint() -> None:
+    catalog = _build_catalog(
+        llm_profile={
+            "id": "llm-p",
+            "name": "OmniRoute",
+            "binding": "omniroute",
+            "base_url": "",
+            "api_key": "omniroute-test-key",
+            "api_version": "",
+            "extra_headers": {},
+            "models": [{"id": "llm-m", "name": "m", "model": "openai/gpt-4o-mini"}],
+        }
+    )
+    resolved = resolve_llm_runtime_config(catalog=catalog)
+    assert resolved.provider_name == "omniroute"
+    assert resolved.provider_mode == "gateway"
+    assert resolved.effective_url == "https://api.omniroute.io/v1"
+
+
+def test_llm_omniroute_base_keyword_gateway() -> None:
+    catalog = _build_catalog(
+        llm_profile={
+            "id": "llm-p",
+            "name": "LLM",
+            "binding": "",
+            "base_url": "https://api.omniroute.io/v1",
+            "api_key": "k",
+            "api_version": "",
+            "extra_headers": {},
+            "models": [{"id": "llm-m", "name": "m", "model": "anthropic/claude-sonnet-4.6"}],
+        }
+    )
+    resolved = resolve_llm_runtime_config(catalog=catalog)
+    assert resolved.provider_name == "omniroute"
+    assert resolved.provider_mode == "gateway"
+    assert resolved.effective_url == "https://api.omniroute.io/v1"
+
+
 def test_llm_atlascloud_binding_uses_default_openai_compatible_endpoint() -> None:
     catalog = _build_catalog(
         llm_profile={

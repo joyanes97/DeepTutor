@@ -90,3 +90,23 @@ def test_orcarouter_provider_aliases_and_detection() -> None:
     # An OpenRouter key/base must not be claimed by OrcaRouter.
     assert find_gateway(api_key="sk-or-v1-abcdef") is not None
     assert find_gateway(api_key="sk-or-v1-abcdef").name != "orcarouter"
+
+
+def test_omniroute_provider_aliases_and_detection() -> None:
+    spec = find_by_name("omniroute")
+
+    assert spec is not None
+    assert spec.display_name == "OmniRoute"
+    assert spec.env_key == "OMNIROUTE_API_KEY"
+    assert spec.backend == "openai_compat"
+    assert spec.mode == "gateway"
+    assert spec.default_api_base == "https://api.omniroute.io/v1"
+    # Canonical + common aliases
+    assert find_by_name("omni") == spec
+    assert find_by_name("omni-route") == spec
+    assert find_by_name("omni_route") == spec
+    # Detection via api_base keyword
+    assert find_gateway(api_base="https://api.omniroute.io/v1") == spec
+    assert find_gateway(api_base="https://api.omniroute.io/v1/chat/completions") == spec
+    # Unknown host must not claim OmniRoute.
+    assert find_gateway(api_key="sk-or-v1-abcdef").name != "omniroute"
