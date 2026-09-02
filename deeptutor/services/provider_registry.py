@@ -155,6 +155,9 @@ PROVIDER_ALIASES = {
     "novita_ai": "novita",
     "orca_router": "orcarouter",
     "orca-router": "orcarouter",
+    "omni-route": "omniroute",
+    "omni_route": "omniroute",
+    "omni": "omniroute",
 }
 
 
@@ -223,6 +226,16 @@ PROVIDERS: tuple[ProviderSpec, ...] = (
         detect_by_key_prefix="sk-orca-",
         detect_by_base_keyword="orcarouter",
         default_api_base="https://api.orcarouter.ai/v1",
+    ),
+    ProviderSpec(
+        name="omniroute",
+        keywords=("omniroute", "omni", "omni-route", "omni_route"),
+        env_key="OMNIROUTE_API_KEY",
+        display_name="OmniRoute",
+        backend="openai_compat",
+        is_gateway=True,
+        detect_by_base_keyword="omniroute",
+        default_api_base="https://api.omniroute.io/v1",
     ),
     ProviderSpec(
         name="edenai",

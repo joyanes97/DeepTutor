@@ -283,6 +283,15 @@ EMBEDDING_PROVIDERS: dict[str, EmbeddingProviderSpec] = {
         default_model="openai/text-embedding-3-large",
         default_dim=3072,
     ),
+    "omniroute": EmbeddingProviderSpec(
+        label="OmniRoute",
+        adapter="openai_compat",
+        default_api_base=EMBEDDING_PROVIDER_DEFAULT_ENDPOINTS["omniroute"],
+        keywords=("omniroute", "omni", "omni-route", "omni_route"),
+        is_local=False,
+        default_model="openai/text-embedding-3-large",
+        default_dim=3072,
+    ),
 }
 
 

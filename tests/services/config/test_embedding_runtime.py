@@ -103,6 +103,33 @@ def test_embedding_orcarouter_binding_uses_default_endpoint() -> None:
     assert resolved.dimension == 3072
 
 
+def test_embedding_omniroute_binding_uses_default_endpoint() -> None:
+    catalog = _build_catalog(
+        embedding_profile={
+            "id": "embedding-p",
+            "name": "Embedding",
+            "binding": "omniroute",
+            "base_url": "",
+            "api_key": "omniroute-test-key",
+            "api_version": "",
+            "extra_headers": {},
+            "models": [
+                {
+                    "id": "embedding-m",
+                    "name": "omniroute",
+                    "model": "openai/text-embedding-3-large",
+                    "dimension": "3072",
+                }
+            ],
+        }
+    )
+    resolved = resolve_embedding_runtime_config(catalog=catalog)
+    assert resolved.provider_name == "omniroute"
+    assert resolved.provider_mode == "standard"
+    assert resolved.effective_url == "https://api.omniroute.io/v1/embeddings"
+    assert resolved.dimension == 3072
+
+
 def test_embedding_runtime_preserves_api_key_array() -> None:
     catalog = _build_catalog(
         embedding_profile={

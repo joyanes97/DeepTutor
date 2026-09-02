@@ -68,6 +68,7 @@ OPENAI_COMPATIBLE_EMBEDDING_BINDINGS = frozenset(
         "openai",
         "openrouter",
         "orcarouter",
+        "omniroute",
         "siliconflow",
         "vllm",
     }
