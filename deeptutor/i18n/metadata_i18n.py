@@ -60,7 +60,6 @@ _TOOL_DESCRIPTIONS: dict[str, dict[str, str]] = {
         "zh": "在隔离沙箱工作区中运行 shell 命令。",
         "es": "Ejecuta comandos de terminal en un espacio de trabajo aislado.",
     },
-    },
     "kb_files": {
         "en": "List the documents a knowledge base holds, with the total count.",
         "zh": "列出知识库中的文档清单与总数。",
