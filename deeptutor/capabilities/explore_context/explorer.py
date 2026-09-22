@@ -32,7 +32,6 @@ from typing import Any, Callable
 from deeptutor.core.context import UnifiedContext
 from deeptutor.core.trace import build_trace_metadata, merge_trace_metadata, new_call_id
 from deeptutor.runtime.agentic import (
-    MAX_PARALLEL_TOOL_CALLS,
     LLMClientConfig,
     build_completion_kwargs,
     build_openai_client,
@@ -47,8 +46,8 @@ from deeptutor.services.config.loader import get_capability_params
 from deeptutor.services.llm import clean_thinking_tags, get_llm_config, get_token_limit_kwargs
 from deeptutor.services.llm import stream as llm_stream
 from deeptutor.services.llm.capabilities import threads_session_id
-from deeptutor.services.session.provider_response_state import normalize_provider_response_state
 from deeptutor.services.prompt.language import append_language_directive, normalize_language
+from deeptutor.services.session.provider_response_state import normalize_provider_response_state
 
 logger = logging.getLogger(__name__)
 
@@ -184,7 +183,7 @@ class ContextExplorer:
         source_index: dict[str, str],
         usage: Any | None,
     ) -> str:
-system_prompt = append_language_directive(self._t("loop.system"), self.language)
+        system_prompt = append_language_directive(self._t("loop.system"), self.language)
         user_template = self._t("loop.user_template")
         if not system_prompt or not user_template:
             logger.warning("explore_context loop prompts missing; using single pass")
